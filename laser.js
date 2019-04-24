@@ -39,5 +39,4 @@ function Laser(spos, angle) {
     return false;
   }
 
-
 }
