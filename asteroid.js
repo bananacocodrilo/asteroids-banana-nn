@@ -3,7 +3,7 @@
 // http://patreon.com/codingtrain
 // Code for: https://youtu.be/hacZU523FyM
 
-function Asteroid(pos, r, color) {
+function Asteroid(pos, r, color, vel) {
   if (pos) {
     this.pos = pos.copy();
   } else {
@@ -17,11 +17,14 @@ function Asteroid(pos, r, color) {
 
   this.color = color? color : 255;
 
-
-  this.vel = p5.Vector.random2D();
-  this.vel.x*=2
-  this.vel.y*=2
-
+  if(!vel){
+    this.vel = p5.Vector.random2D();
+    this.vel.x*=2
+    this.vel.y*=2
+  }else{
+    this.vel = vel;
+  }
+    
   this.total = floor(random(5, 9));
   this.offset = [];
   for (var i = 0; i < this.total; i++) {
