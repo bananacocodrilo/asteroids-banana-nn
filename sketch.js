@@ -67,7 +67,7 @@ function draw() {
     fill(previousGen.color)
         .strokeWeight(4)
         .textSize(20);
-        info = `Previous gen best score: ${previousGen.bestScore}, duration ${Math.floor(previousGen.duration/30)}`
+        info = `Previous gen best score: ${Math.floor(previousGen.bestScore)}, duration ${Math.floor(previousGen.duration/30)}`
     text(info, 10, 50);
 
 
