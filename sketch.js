@@ -2,16 +2,24 @@
 // http://codingtra.in
 // http://patreon.com/codingtrain
 // Code for: https://youtu.be/hacZU523FyM
-const initialAsteroidsAmount = 15;
+const initialAsteroidsAmount = 5;
 
 const generationSize = 200;
 const sparedAmount = 1; // Must be lower than generationSize
 const mutationRate = 0.1;
+const shotCooldown = 45;
+
+const fps = 30
+const timeWeight = 0.01
+
 
 const maxShots = 15;
-const maxAsteroids = 150;
+const maxAsteroids = 20;
 
 let genCount = 0;
+
+
+
 
 let ship;
 let asteroids = [];
@@ -33,9 +41,10 @@ let previousGen = {
 }
 
 function setup(){
-    createCanvas(1600, 1200);
-    frameRate(60)
+    createCanvas(800, 450);
+    frameRate(30)
     noLoop();
+
     for(let i = 0; i < generationSize; i++){
         alivePlayers[i] = new Player({render: false});
     }
@@ -72,6 +81,7 @@ function draw() {
         }
 
         if(!alivePlayers[i].alive){
+            alivePlayers[i].score += simulationFrames*timeWeight;
             deadPlayers.push(alivePlayers[i]);
             alivePlayers.splice(i,1);
 
@@ -101,6 +111,7 @@ function prepareNextGeneartion(){
     alivePlayers = [];
 
     deadPlayers.sort((a,b)=> {
+
         return b.score - a.score;
     })
     
