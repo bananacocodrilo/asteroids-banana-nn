@@ -7,6 +7,8 @@ function Player(options) {
     this.score = 0;
     this.timeAlive =  0;
     this.alive =  true;
+    this.lasersTimer = -shotCooldown;
+
 
     this.render =  options.hasOwnProperty('render')? options.render : false;
     
@@ -29,7 +31,15 @@ function Player(options) {
     this.initializeGame = () => {
         this.ship = new Ship(this.color, this.borderColor);
 
-        for (var i = 0; i < initialAsteroidsAmount; i++) {
+        // Lets kill fast the dumb players
+        this.asteroids.push(
+            new Asteroid(createVector(width/5, height/5), 
+                null, 
+                color(255,255,255), 
+                createVector(2*width/(height+width), 2*height/(height+width))
+            )
+        );
+        for (var i = 1; i < initialAsteroidsAmount; i++) {
             this.asteroids.push(new Asteroid(null, null, this.color));
         }
 
@@ -50,7 +60,8 @@ function Player(options) {
             
             if(this.output[0]){
                 // I dont like the machinegun-beyblades I'm getting
-                if(this.lasers.length < maxShots){
+                if(this.lasersTimer < simulationFrames){
+                    this.lasersTimer = simulationFrames + shotCooldown ;
                     this.lasers.push(new Laser(this.ship.pos, this.ship.heading));
                 }
             }
@@ -145,42 +156,48 @@ function Player(options) {
 
 
         // Compose the inputs for the neural network before the next play 
-        this.inputs = [
-            this.ship.heading, 
-            this.ship.vel.mag(), 
-            this.ship.vel.heading(), 
-            this.ship.pos.x, 
-            this.ship.pos.y,
-            this.lasers.length
-        ];
+        this.inputs = []
+        //     this.ship.heading, 
+        //     this.ship.vel.mag(), 
+        //     this.ship.vel.heading(), 
+        //     this.ship.pos.x, 
+        //     this.ship.pos.y,
+        //     this.lasers.length
+        // ];
         this.inputs = normalize(this.inputs.concat(this.ship.view))
     }
 
     this.increaseDifficulty = () => {
         // Create a new asteroid every 5 points starting at 10
         // The asteroid is created at a random position trying to be far from the ship
-        if(this.score > 10 && this.score % 4 == 0 && this.asteroids.length < maxAsteroids){
-            this.asteroids.push(
-                new Asteroid( 
-                    createVector(this.ship.pos.x + width * (0.2 + Math.random()/2), 
-                                this.ship.pos.y + height * (0.2 + Math.random()/2)),
-                    random(100, 200),
-                    this.color)
-            );       
+        if(this.score > 10 && this.score % 4 == 0 ){
+            if(this.asteroids.length < maxAsteroids){
+                this.asteroids.push(
+                    new Asteroid( 
+                        createVector(this.ship.pos.x + width * (0.2 + Math.random()/2), 
+                                    this.ship.pos.y + height * (0.2 + Math.random()/2)),
+                        random(100, 200),
+                        this.color)
+                );       
+            }else{
+                this.asteroids.forEach((asteroid)=>{
+                    asteroid.vel *= 1.1;
+                })
+            }
         }
     }
 }
 
 function normalize(inputs){
-    inputs[0] /= TWO_PI;
-    inputs[1] /= 9.9;
-    inputs[2] /= inputs[2]/TWO_PI + 0.5;
-    inputs[3] /= width;
-    inputs[4] /= height;
-    inputs[5] /= maxShots;
+    // inputs[0] /= TWO_PI;
+    // inputs[1] /= 9.9;
+    // inputs[2] /= inputs[2]/TWO_PI + 0.5;
+    // inputs[3] /= width;
+    // inputs[4] /= height;
+    // inputs[5] /= maxShots;
      
-    for(let i = 6; i<16; i++){
-        inputs[i] /= 1000;
+    for(let i = 0; i<10; i++){
+        inputs[i] = 1 - (inputs[i]/ 1000);
     }
 
     return inputs;

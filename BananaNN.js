@@ -7,21 +7,21 @@ function BananaNN(genome){
     tf.tidy(() => {
         if(genome) {
             for(var i = 0; i < genome.length; i++){
-                this.genome[i] = tf.tensor(genome[i].values, genome[i].shape)
+                this.genome[i] = tf.tensor(genome[i].values, genome[i].shape);
             }
         }
         
         this.model = tf.sequential();
         this.hiddenLayer = tf.layers.dense({
-            inputShape: [16],
+            inputShape: [10],
             units: 12,
             activation: 'sigmoid'
-        })
+        });
         
         this.outputLayer = tf.layers.dense({
             units: 4,
             activation: 'sigmoid'
-        })
+        });
         
         
         this.model.add(this.hiddenLayer);
