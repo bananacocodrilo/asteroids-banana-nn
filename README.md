@@ -1,12 +1,12 @@
-To watch it work simply open the index.html file in your browser.
+![nn training](https://raw.githubusercontent.com/bananacocodrilo/asteroids-banana-nn/master/playing.png)
 
-In the console is logged the info needed to recreate the model of each generation best player.
+To see it playing simply open index.html in your browser.
 
-Right now all they seem to learn is to spin and shoot in frenzy. 
+I've tried many modifications and it still doesn't seem to learn. I still want to try to increase the population size by making them playing in batches.
 
-Next steps are:
-  - Limit to one shot every N frames instead of 15 shoots at the same time.
-  - Reduce drastically the limit of asteroids.
-  - Increase the dificulty as the time pases by increasing the asteroids speed.
-  - Reward the survival time, not only the amount of asteroids destroyed.
-  
+Right now I wont keep working in this example until I have learned more about Tensorflow, but the following steps are:
+
+ - Refactor the code. 
+ - Properly implement NEAT algorythm.
+ - Divide the population in batches.
+ - Add a small interface to save/load models and the option to see only one playing by itself
