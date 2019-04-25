@@ -7,7 +7,7 @@ function Ship(color, borderColor) {
     // Number of diviews for the field of view
     const viewSections = 10;
     // Max distance the ship can see in each direction
-    const maxHorizon = 1000;
+    const maxHorizon = 300;
 
     this.pos = createVector(width / 2, height / 2);
     this.r = 20;
