@@ -33,7 +33,7 @@ function Player(options) {
 
         // Lets kill fast the dumb players
         this.asteroids.push(
-            new Asteroid(createVector(width/5, height/5), 
+            new Asteroid(createVector(width/3, height/3), 
                 null, 
                 color(255,255,255), 
                 createVector(2*width/(height+width), 2*height/(height+width))
@@ -53,10 +53,10 @@ function Player(options) {
         if(this.alive){
             this.output = this.neuralNetwork.compute(this.inputs);
 
-            this.output = [Math.round(this.output[0]),
-                Math.round(this.output[1]),
-                Math.round(this.output[2]),
-                Math.round(this.output[3])]
+            this.output = [this.output[0] > 0.8,
+                this.output[1] > 0.8,
+                this.output[2] > 0.8,
+                this.output[3] > 0.8]
             
             if(this.output[0]){
                 // I dont like the machinegun-beyblades I'm getting
