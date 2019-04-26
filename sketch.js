@@ -74,6 +74,7 @@ function draw() {
 
         if(!playingPlayers[i].alive){
             playingPlayers[i].score += simulationFrames*timeWeight;
+            playingPlayers[i].survivalTime = simulationFrames/fps;
             deadPlayers.push(playingPlayers[i]);
             playingPlayers.splice(i,1);
 
@@ -148,7 +149,7 @@ function prepareNextGeneartion(){
             spareData: {
                 position: i+1,
                 score: deadPlayers[i].score,
-                survivalTime: simulationFrames
+                survivalTime: deadPlayers[i].survivalTime
             }
         }
         
