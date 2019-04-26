@@ -4,7 +4,8 @@
 // Code for: https://youtu.be/hacZU523FyM
 const initialAsteroidsAmount = 5;
 
-const generationSize = 200;
+const generationSize = 1000;
+const batchSize = 50;
 const sparedAmount = 1; // Must be lower than generationSize
 const mutationRate = 0.1;
 const shotCooldown = 45;
@@ -20,13 +21,16 @@ let genCount = 0;
 
 
 
-
+let totalScore;
 let ship;
 let asteroids = [];
 let lasers = [];
 
 let alivePlayers = new Array();
+let playingPlayers = new Array();
 let deadPlayers = new Array();
+let batch = 0;
+
 
 let bestScore = 0;
 let simulationFrames = 0;
@@ -56,58 +60,71 @@ function setup(){
 function draw() {
     background(0);
     simulationFrames++;
-    
-    
-    fill(255)
-        .strokeWeight(4)
-        .textSize(20);
-    let info = `Gen: ${genCount}. Current best: ${bestScore}, Simulation time: ${Math.floor(simulationFrames/30)}, ${alivePlayers.length}/${generationSize} still alive. fr: ${Math.round(getFrameRate())}` 
-    text(info, 10, 30);
-    
-    fill(previousGen.color)
-        .strokeWeight(4)
-        .textSize(20);
-        info = `Previous gen best score: ${Math.floor(previousGen.bestScore)}, duration ${Math.floor(previousGen.duration/30)}`
-    text(info, 10, 50);
 
 
-    for(let i = alivePlayers.length - 1; i >= 0; i--){
 
-        alivePlayers[i].nextTurn();
-        alivePlayers[i].play();
+    for(let i = playingPlayers.length - 1; i >= 0; i--){
+
+        playingPlayers[i].nextTurn();
+        playingPlayers[i].play();
         
-        if( alivePlayers[i].score > bestScore){
-            bestScore = alivePlayers[i].score
+        if( playingPlayers[i].score > bestScore){
+            bestScore = playingPlayers[i].score
         }
 
-        if(!alivePlayers[i].alive){
-            alivePlayers[i].score += simulationFrames*timeWeight;
-            deadPlayers.push(alivePlayers[i]);
-            alivePlayers.splice(i,1);
+        if(!playingPlayers[i].alive){
+            playingPlayers[i].score += simulationFrames*timeWeight;
+            deadPlayers.push(playingPlayers[i]);
+            playingPlayers.splice(i,1);
 
-            if(alivePlayers.length){
-                alivePlayers[0].render = true;
+            if(playingPlayers.length){
+                playingPlayers[0].render = true;
             }
 
         }
 
     }
 
-    if(alivePlayers.length == 0 ){
+    if(playingPlayers.length == 0){
+        let i = 0;
+        for(i = 0; i < batchSize && i<alivePlayers.length; i++){
+            playingPlayers.push(alivePlayers[i]);
+        }
+        alivePlayers.splice(0,i);
+        simulationFrames=0;
+        batch++;
+    }
+
+    if(playingPlayers.length == 0 && alivePlayers.length == 0 ){
         noLoop();
-        console.log('AllMyFriendsAreDead.jpg')
         prepareNextGeneartion();
         launchSimulation();
-        console.log(generationBests)
+        console.log(`Gen ${genCount-1} best score: ${Math.round(10*generationBests[genCount-1].data.score)/10}, avg: ${Math.round(10*totalScore/generationSize)/10}`)
+        console.log(generationBests[genCount-1].genome)
     }
+
+    
+    let info = `Gen: ${genCount}, batch: ${batch}/${Math.ceil(generationSize/batchSize)}. Current best: ${bestScore}, sim time: ${Math.floor(simulationFrames/30)}; ${playingPlayers.length}/${batchSize} still alive. fr: ${Math.round(getFrameRate())}` 
+    let info2 = `Previous gen best score: ${Math.floor(previousGen.bestScore)}, duration ${Math.floor(previousGen.duration/30)}`
+    
+    fill(255)
+        .strokeWeight(4)
+        .textSize(20);
+    text(info, 10, 30);
+    
+    fill(previousGen.color)
+        .strokeWeight(4)
+        .textSize(20);
+    text(info2, 10, 50); 
+
 }
 
 
 
 
 function prepareNextGeneartion(){
-    let totalScore = 0;
     let firstChoosingScore, secondChoosingScore;
+    totalScore = 0;
     alivePlayers = [];
 
     deadPlayers.sort((a,b)=> {
@@ -203,7 +220,8 @@ function launchSimulation(){
     genCount++;
     simulationFrames = 0;
     bestScore = 0;
-
+    batch = 0;
+    
     for(let i = 0; i< deadPlayers.length; i++){
         deadPlayers[i].neuralNetwork.clean();
     }
@@ -234,7 +252,7 @@ function breed(firstParent, secondParent){
     let childGenome = [];
     let firstParentGenome = firstParent.neuralNetwork.model.getWeights();
     let secondParentGenome = secondParent.neuralNetwork.model.getWeights();
-    let midPoint = firstParent.score / (firstParent.score + secondParent.score);
+    let midPoint = 0.5;//firstParent.score / (firstParent.score + secondParent.score);
     
     
     
@@ -257,20 +275,11 @@ function breed(firstParent, secondParent){
 
             //Random mutation
             if(Math.random < mutationRate) {
-                childGenome[i].values[j]  = (childGenome[i].values[j] + randomGaussian()) % 1;
+                childGenome[i].values[j]  = (childGenome[i].values[j] + random(0.1));
             }
 
         }
     }
 
     return childGenome;
-}
-
-
-
-function keyPressed(){
-    if (key == ' ') {
-        console.log('Next simulation will run only with the current best');
-        onlyTheBest = true;
-    }
 }
