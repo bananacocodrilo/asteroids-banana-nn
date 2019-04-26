@@ -8,5 +8,9 @@ Right now I wont keep working in this example until I have learned more about Te
 
  - Refactor the code. 
  - Properly implement NEAT algorythm.
- - Divide the population in batches.
  - Add a small interface to save/load models and the option to see only one playing by itself
+
+
+Currently I'm testing:
+ - Divide the population in batches.
+ - Increase the confidence limit needed to press a button
